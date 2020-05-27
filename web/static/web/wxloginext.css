@@ -1,0 +1,7 @@
+.impowerBox .title {display: none;}
+.impowerBox .info {display: none;}
+.impowerBox .qrcode{
+  border: none;
+  width: 266px;
+  margin-top: 24px;
+}

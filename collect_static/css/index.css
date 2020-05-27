@@ -1,0 +1,9 @@
+.index-body{
+    margin-top: 0;
+    background-color: #b81900;
+}
+#index {
+    width: 100%;
+    min-height: 100%;
+    cursor: pointer;
+}

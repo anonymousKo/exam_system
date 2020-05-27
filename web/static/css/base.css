@@ -1,0 +1,60 @@
+body {
+    padding-bottom: 70px;
+}
+.base-body{
+    height: 100%;
+    overflow-x: hidden;
+    background:url("../img/background.png");
+}
+#body-content {
+    margin-top: 24px;
+}
+.base-header{
+    text-align:center;
+    padding:62px 0;
+    background:#96CDCD;
+    min-height: 250px;
+}
+.base-header h1{
+    color:#FF7F00;
+    font-size: 64px;
+    font-weight: 600;
+}
+.base-header small {
+    font-size: 16px;
+    color: #000;
+}
+.navbar-brand{
+    color: black;
+}
+#searchKeyWord{
+    background-color: transparent;
+    border-color: black;
+}
+#searchCom{
+    background-color: transparent;
+    border-color: black;
+}
+#signInButton{
+    background-color: transparent;
+    border-color: black;
+}
+#gameList .list-group-item{
+
+}
+#categoryList .btn{
+    min-height: 48px;
+}
+#navTab{
+    margin-top: 40px;
+}
+#navTab .navbar-brand{
+    font-size: 18px;
+}
+#signInButton{
+    font-weight: 600;
+}
+.modalForm1{
+    margin-left: 100px;
+    width: 400px;
+}

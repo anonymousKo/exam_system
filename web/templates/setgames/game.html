@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}配置比赛{% endblock %}
+{% block content %}
+<style>
+    .save-button {
+        margin-top: 25px;
+        width: 239px;
+        line-height: 60px;
+        text-align: center;
+        background: #d9534f;
+        color: #fff;
+        font-size: 24px;
+        border-radius: 3px;
+        border: 0;
+        margin-left: -150px;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+</style>
+<div class="main-content container" style="background: url(/static/images/form-bg.jpg) no-repeat center top;">
+    <div class="inner-content" style="padding-top:50px;color: white;">
+        <div class="union-title-black" style="color:white">配置比赛</div>
+        <div class="col-md-2" style="margin-left: 60px">
+        <div class="row">
+            <h3>选择题库</h3>
+            <label for="bankType">题库类型</label>
+            <div id="bankType" class="dropdown">
+                <input type="button" style="height: 40px;width: 80px" id="choicedValue" class="btn btn-info dropdown-toggle" data-toggle="dropdown" name="bank_type" value="热门题库" />
+                <ul class="dropdown-menu">
+                    {% for t in bank_types %}
+                        <li class="btn btn-info" style="height: 40px;width: 80px" onclick="choiceBankType(this)">{{ t.name }}</li>
+                    {% endfor %}
+                    <li class="btn btn-info" style="height: 40px;width: 80px" onclick="choiceBankType(this)">热门题库</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+            <label for="bankListGroup">选择题库</label>
+            <div id="bankListGroup" class="list-group">
+                {% for b in banks %}
+                    <div id="{{ b.bank_id }}" class="list-group-item btn btn-info" style="background-color: rgb(70, 184, 218);"
+                         onclick="getBankModal('{{ b.bank_id }}')">
+                        <span>{{ b.bank_name|truncatechars:15 }}  ({{ b.total_question_num }}题)</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        </div>
+        <div class="col-md-4" style="margin-left: 60px">
+            <h3>配置比赛</h3>
+            <form class="form-group">
+                <label for="competetionName">比赛名称</label>
+                <input id="competetionName" type="text" class="form-control" placeholder="填写比赛名称" />
+                <label for="sponsorName">机构名称</label>
+                <input id="sponsorName" type="text" class="form-control" placeholder="填写机构名称" />
+                <label for="questionNum">出题数量</label>
+                <input id="questionNum" type="number" class="form-control" value="10" />
+                <label for="totalScore">总分数</label>
+                <input id="totalScore" type="number" class="form-control" value="100" />
+                <label for="copStartAt">开始时间</label>
+                <input id="copStartAt" type="datetime-local" class="form-control" />
+                <label for="copFinishAt">结束时间</label>
+                <input id="copFinishAt" type="datetime-local" class="form-control">
+                <label for="period">答题时间限制</label>
+                <input id="period" type="text" class="form-control" placeholder="填写答题时常限制单位为分钟(min)" />
+            </form>
+        </div>
+        <div class="col-md-4" style="margin-left: 60px">
+            <h3>配置页面数据(可选)</h3>
+            <form class="form-group">
+                <label for="ruleText">比赛规则</label>
+                <textarea id="ruleText" class="form-control" placeholder="请输入比赛规则的内容，让答题者快速了解比赛内容"></textarea>
+                <label for="isShowUserForm" style="margin-top: 30px">开启录入信息功能</label>
+                <span id="userFormTips" style="margin-left: 5px" class="btn badge" title="" data-toggle="tooltip" data-placement="left">?</span>
+                <input id="isShowUserForm" type="checkbox" class="form-control" style="width: 15px;height: 15px" />
+                <label for="cxTable" style="margin-top: 30px;">您想要录入的字段</label>
+                <span id="formFieldsTips" style="margin-left: 5px" class="btn badge" title="">?</span>
+                <table id="cxTable" class="table table-bordered">
+                    <tr>
+                    {% for f in form_fields %}
+                        <td>
+                            <label for="cx{{ f.field_name }}">{{ f.label }}</label>
+                        </td>
+                    {% endfor %}
+                    </tr>
+                    <tr>
+                    {% for f in form_fields %}
+                        <td>
+                            <input id="cx{{ f.field_name }}" type="checkbox" value="{{ f.field_name }}" name="checks" onchange='checkField("{{ f.field_name }}")'>
+                        </td>
+                    {% endfor %}
+                    {% for f in form_fields %}
+                    {% endfor %}
+                    </tr>
+                </table>
+                <label for="optionFields" style="margin-top: 10px">作为下拉框的字段</label>
+                <span id="optionFieldsTips" style="margin-left: 5px" class="btn badge" title="">?</span><br />
+                <table id="optionResult" class="table table-hover">
+                </table>
+                <div id="addOptionFields" class="glyphicon glyphicon-plus" style="font-size: 32px;cursor: pointer"></div>
+            </form>
+        </div>
+    </div>
+    <div id="submitAll" class="save-button">保存到数据库</div>
+
+    <div id="optionFieldsModal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-title">
+                    <div class="form-group" id="optionFieldsForm">
+                        <label for="optionFieldName" style="margin-left: 100px;width: 400px;">选择一个字段名</label>
+                        <select id="optionFieldName" class="form-control" style="margin-left: 100px;width: 400px">
+                            {% for f in form_fields %}
+                                <option class="form-control" style="margin-left: 100px;width: 400px;" name="{{ f.field_name }}">{{ f.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="optionFieldValue" style="margin-left: 100px;">输入一个可选值</label>
+                        <input type="text" id="optionFieldValue" class="form-control" style="margin-left: 100px;width: 400px;" placeholder="字段可选值，每一个值用#隔开，如: 吃饭#看电影#逛街">
+                        <input type="submit" id="submitOptionField" class="btn btn-success" value="设置为下拉框" style="margin-left: 100px;margin-top: 20px;width: 400px" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bankModal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-title">
+                    <h2 class="text-center">题库信息</h2>
+                    <div id="bankModalContent">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script src="{% static 'js/currentTime.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var curTime = CurentTime();
+            var userFormTips = "开启录入信息功能将在答题前展示一个表单，\n" +
+                "这个表单用来录入一些您想要的用户信息，\n" +
+                "您可以通过下面的复选框指定录入哪些信息。";
+            var formFieldsTips = "如果您启用了表单信息录入功能，\n" +
+                    "选定你想要的展示的字段即可。\n";
+            var optionFieldsTips = "如果普通的输入框不能满足需求，\n" +
+                "点击下面的加号将上面的字段变成下拉框的形式。\n" +
+                "必须事上面勾选过的字段才能设置为下拉框形式。";
+
+
+            $('#copStartAt').val(curTime);
+            $('#copFinishAt').val(curTime);
+            $('#userFormTips').attr('title', userFormTips);
+            $('#formFieldsTips').attr('title', formFieldsTips);
+            $('#optionFieldsTips').attr('title', optionFieldsTips);
+        });
+
+        var choicedBankType;  // 存放选择的题库类型
+        var choicedBankId;  //存放选择的题库ID
+        var optionFieldList = [];  //存放配置的下拉框字段和值
+        var formFields = [];  //存放表单展示的字段和顺序
+        var optionFields = {{ form_fields|safe }};
+        for(var i in optionFields){optionFieldList[optionFields[i].field_name]=''}
+        var responseTypes = {{ bank_types|safe }};
+
+        var choiceBankType = function (t) {
+            var cbt = $(t).html();
+            if(cbt === '热门题库') {
+                choicedBankType = 999;
+            }
+            for(var i in responseTypes){
+                if(responseTypes[i].name === cbt){
+                    choicedBankType = responseTypes[i].id;
+                    break;
+                }
+            }
+            $('#choicedValue').val(cbt);
+            $.ajax({
+                url: '/api/banks/s/' + choicedBankType,
+                type: 'get',
+                data: {},
+                dataType: 'json',
+                success: function (res) {
+                    if(res.status === 200) {
+                        var banks = res.data.banks;
+                        var bankHTML = '';
+                        if(banks) {
+                            for(var i in banks){
+                                bankHTML += '<div id=\"' + banks[i].bank_id + '\"class=\"list-group-item btn btn-info\" style=\"background-color: rgb(70, 184, 218)\" onclick=\"getBankModal(\'' + banks[i].bank_id + '\')\">\n';
+                                bankHTML += '<span>' + banks[i].bank_name + '  (' + banks[i].total_question_num + '题)</span>\n';
+                                bankHTML += '</div>';
+                            }
+                            document.getElementById('bankListGroup').innerHTML = bankHTML;
+                            $('#' + choicedBankId).css('background-color', '#BFEFFF');
+                        }
+                    }
+                }
+            })
+        };
+
+        var getBankModal = function(bank_id){
+            $('#bankModal').modal('show');
+            $.ajax({
+                url: '/api/banks/detail/' + bank_id,
+                type: 'get',
+                data: {},
+                dataType: 'json',
+                success: function (res) {
+                    var strHTML = '<div>\n<h>';
+                    if(res.status === 200) {
+                        var data = res.data.bank_info;
+                        strHTML += '<ul text-align: center\" class=\"list-group\">\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">题库名称</b><b style=\"margin-left: 200px\">' + data.bank_name + '</b></li>\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">题库类型</b><b style="margin-left: 200px">' + data.bank_type + '</b></li>\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">题库大小</b><b style="margin-left: 200px">' + data.total_question_num + '</b></li>\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">选择题数</b><b style="margin-left: 200px">' + data.choice_num + '</b></li>\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">填空题数</b><b style="margin-left: 200px">' + data.fillinblank_num + '</b></li>\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">参与人次</b><b style="margin-left: 200px">' + data.partin_num + '</b></li>\n';
+                        strHTML += '<li class=\"list-group-item\"><b style=\"float: left\">已出比赛</b><b style="margin-left: 200px">' + data.kind_num + '</b></li>\n';
+                        strHTML += '</ul>\n';
+                        strHTML += '<button style=\"margin-left: 500px;margin-bottom: 10px;\" id=\"useThisBank\" class=\"btn btn-primary\" onclick=\"useThisBank(\''+ data.bank_id +'\')\">使用题库</button><br />';
+                        document.getElementById('bankModalContent').innerHTML = strHTML;
+                    }
+                }
+            })
+        };
+
+        $('#addOptionFields').click(function () {
+           $('#optionFieldsModal').modal('show');
+           $('#optionFieldValue').val('');
+           $('#submitOptionField').click(function () {
+               var choicedField = $('#optionFieldName').val();
+               var fieldValue = $('#optionFieldValue').val();
+               if(!checkFormFieldName(getFieldName(choicedField))) {
+                   $('#optionFieldValue').val('');
+                   $('#optionFieldName').css('border', '1px solid red');
+                   $('#optionFieldValue').css('border', '1px solid red');
+                   $('#optionFieldValue').attr('placeholder', '该字段没有在\"您想要录入的字段\"中勾选，不能设置下拉框！');
+                   return false;
+               }else{
+                   $('#optionFieldName').css('border', '1px solid #C1FFC1');
+                   $('#optionFieldValue').css('border', '1px solid #C1FFC1');
+               }
+               if(!fieldValue) {
+                   $('#optionFieldValue').attr('placeholder', '必须至少一个可选项，每个选项之间用#隔开！');
+                   $('#optionFieldValue').css('border', '1px solid red');
+                   return false;
+               }else{
+                   $('#optionFieldValue').css('border', '1px solid #C1FFC1');
+               }
+               var choicedfieldName;
+               for(var i in optionFields) {
+                   if(optionFields[i].label === choicedField) {
+                       choicedfieldName = optionFields[i].field_name;
+                       break;
+                   }
+               }
+               optionFieldList[choicedfieldName] = fieldValue;
+               $('#optionFieldsModal').modal('hide');
+               var strHTML = '';
+               for(var i in optionFieldList) {
+                   if((i !== choicedfieldName) && optionFieldList[i]) {
+                       var label = getFieldLabel(i);
+                       strHTML += '<tr id=\"tr' + i + '\"><td>' + label + '</td><td>' + optionFieldList[i] + '</td><td><a id=\"del' + i + '\" href=\"#\" onclick=\'delOptions(\"' + i + '\")\'>删除</a></td></tr>';
+                   }
+               }
+               strHTML += '<tr id=\"tr' + getFieldName(choicedField) + '\"><td>' + choicedField + '</td><td>' + fieldValue + '</td><td><a id=\"del' + getFieldName(choicedField) + '\" href=\"#\" onclick=\'delOptions(\"' + getFieldName(choicedField) + '\")\'>删除</a></td></tr>';
+               strHTML += '</table>';
+               $('#optionResult').html(strHTML);
+           })
+        });
+
+        $('#submitAll').click(function () {
+            var choicedBank = choicedBankId;
+            if(!choicedBank) {
+                alert('请选择一个题库');
+                $('#bankListGroup').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#bankListGroup').css('border', '');
+            }
+            var competitionName = $('#competetionName').val();
+            if(!competitionName) {
+                alert('请输入比赛名称');
+                $('#competetionName').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#competetionName').css('border', '');
+            }
+            var companyName = $('#sponsorName').val();
+            if(!companyName){
+                alert('请输入机构名称');
+                $('#sponsorName').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#sponsorName').css('border', '');
+            }
+            var questionNum = $('#questionNum').val();
+            if(!questionNum){
+                alert('至少出一道题');
+                $('#questionNum').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#questionNum').css('border', '')
+            }
+            var totalScore = $('#totalScore').val();
+            if(!totalScore) {
+                alert('请输入比赛总分数');
+                $('#totalScore').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#totalScore').css('border', '');
+            }
+            var startedAt = $('#copStartAt').val();
+            if(!startedAt){
+                alert('请输入比赛开始时间');
+                $('#copStartAt').css('border', '1px solid red');
+                return false;
+            }else {
+                $('#copStartAt').css('border', '');
+            }
+            var finishedAt = $('#copFinishAt').val();
+            if(!finishedAt || finishedAt <= startedAt) {
+                alert('比赛结束时间必须大于开始时间');
+                $('#copFinishAt').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#copFinishAt').css('border', '');
+            }
+            var period = $('#period').val();
+            var ruleText = $('#ruleText').val();
+            var isShowUserInfo = $('#isShowUserForm').prop('checked');
+            var formFieldList = '';
+            var fieldNameList = '';
+            for(var i in formFields){
+                formFieldList+=(formFields[i] + '#');
+                fieldNameList+=(getFieldLabel(formFields[i]) + '#')
+            }
+            var optionList = '';
+            for(var i in optionFieldList){
+                if(checkFormFieldName(i) && optionFieldList[i]) {
+                    optionList += (i + ':' + optionFieldList[i].replace('#', ',') + '#')
+                }
+            }
+            var accountId = '{{ account_id|safe }}';
+            var uid = '{{ request.session.uid }}';
+
+            $.ajax({
+                url: '/api/banks/set',
+                type: 'post',
+                data: {
+                    'uid': uid,
+                    'account_id': accountId,
+                    'bank_id': choicedBank,
+                    'kind_name': competitionName,
+                    'sponsor_name': companyName,
+                    'question_num': questionNum,
+                    'total_score': totalScore,
+                    'cop_startat': startedAt,
+                    'cop_finishat': finishedAt,
+                    'period': period,
+                    'rule_text': ruleText,
+                    'is_show_userinfo': isShowUserInfo,
+                    'form_data': formFieldList,
+                    'field_name_data': fieldNameList,
+                    'option_data': optionList
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if(res.status === 200) {
+                        window.location.href = '/bs?uid={{ request.session.uid }}&kind_id=' + res.data.kind_info.kind_id + '&created=1';
+                    }
+                }
+            })
+        });
+
+        var delOptions = function (field_name) {
+            $('#tr' + field_name).remove();
+            optionFieldList[field_name] = '';
+        };
+
+        var checkField = function(field_name) {
+            if(checkFieldName(field_name)) {
+                if($('#cx' + field_name).prop('checked')) {
+                    formFields.push(field_name);
+                }else{
+                    formFieldsTmp = [];
+                    for(var i in formFields) {
+                        if(formFields[i] !== field_name) {
+                            formFieldsTmp.push(formFields[i])
+                        }
+                    }
+                    formFields = formFieldsTmp;
+                }
+            }
+        };
+
+        var useThisBank = function(bank_id) {
+            if(choicedBankId) {
+                $('#' + choicedBankId).css('background-color', '');
+            }
+            choicedBankId = bank_id;
+            $('#bankModal').modal('hide');
+            $('#' + bank_id).css('background-color', '#BFEFFF');
+        };
+
+        var getFieldLabel = function(field_name) {
+            for(var i in optionFields) {
+                if(optionFields[i].field_name === field_name) {
+                    return optionFields[i].label;
+                }
+            }
+        };
+
+        var getFieldName = function (label) {
+            for(var i in optionFields) {
+                if(optionFields[i].label === label) {
+                    return optionFields[i].field_name
+                }
+            }
+        };
+
+        var checkFieldName = function (field_name) {
+            for (var i in optionFields) {
+                if (optionFields[i].field_name === field_name) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        var checkFormFieldName = function (field_name) {
+            for(var i in formFields) {
+                if(formFields[i] === field_name) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    </script>
+{% endblock %}

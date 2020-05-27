@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}注册结果{% endblock %}
+{% block content %}
+    <div class="container">
+    {% if is_registered %}
+        {% if bind %}
+            <div class="row" style="min-height: 800px">
+                <div class="span4">
+                    <div class="alert alert-success">
+                        <strong>注册成功！</strong><br /><a href="/">点此</a>返回首页登录
+                    </div>
+                </div>
+            </div>
+        {% else %}
+        <div class="row" style="min-height: 800px">
+            <div class="span4">
+                <div class="alert alert-success">
+                    <strong>注册成功！</strong>还差一步，您需要创建一个密码
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-4">
+            <form>
+                <div class="form-group">
+                    <label for="bizResetId" class="control-label">邮箱</label>
+                    <input type="text" class="form-control" id="bizResetId" placeholder="hugo.zhang@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="bizResetNewPassword" class="control-label">新密码</label>
+                    <input type="password" class="form-control" id="bizResetNewPassword" placeholder="p@ssw0rd123">
+                </div>
+                <div class="form-group">
+                    <label for="bizResetNewPasswordAgain" class="control-label">再次输入密码</label>
+                    <input type="password" class="form-control" id="bizResetNewPasswordAgain" placeholder="p@ssw0rd123">
+                </div>
+                <div class="form-group">
+                    <p style="color: red;float: left">邮件发送后，请在三十分钟之内登录邮箱确认!</p>
+                    <button type="button" class="btn btn-primary" style="float: right" id="bizResetPost">发送邮件</button>
+                </div>
+            </form>
+            </div>
+            <div class="col-md-8">
+            </div>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="row">
+            <div class="span4">
+                <div class="alert alert-danger">
+                    <strong>机构注册失败！</strong>注册过程貌似出现了问题，请您联系<a href="/bs/contact{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">管理员</a>以便找到解决办法。
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+    <script>
+    $('#bizResetPost').click(function () {
+                      var email = $('#bizResetId').val();
+                      var newPassword = $('#bizResetNewPassword').val();
+                      var newPasswordAgain = $('#bizResetNewPasswordAgain').val();
+                      if(!checkEmail(email)) {
+                          $('#bizResetId').val('');
+                          $('#bizResetId').attr('placeholder', '邮件格式错误');
+                          $('#bizResetId').css('border', '1px solid red');
+                          return false;
+                      }else{
+                          $('#bizResetId').css('border', '1px solid #C1FFC1');
+                      }
+                      if(!(newPassword === newPasswordAgain)){
+                          $('#bizResetNewPasswordAgain').val('');
+                          $('#bizResetNewPasswordAgain').attr('placeholder', '两次输入密码不一致');
+                          $('#bizResetNewPassword').css('border', '1px solid red');
+                          $('#bizResetNewPasswordAgain').css('border', '1px solid red');
+                          return false;
+                      }else{
+                          $('#bizResetNewPassword').css('border', '1px solid #C1FFC1');
+                          $('#bizResetNewPasswordAgain').css('border', '1px solid #C1FFC1');
+                      }
+                      $.ajax({
+                          url: '/api/resetpasswd',
+                          type: 'post',
+                          data: {
+                              'email': email,
+                              'new_password': newPassword,
+                              'new_password_again': newPasswordAgain,
+                              'is_biz': 1
+                          },
+                          dataType: 'json',
+                          success: function (res) {
+                              if(res.status === 200) {
+                                  alert('发送成功!请您登录邮箱验证一下您的账户');
+                                  window.location.href = '/index'
+                              }
+                              if(res.status === 300005) {
+                                  alert('邮件正在发送中，请稍等...');
+                              }
+                          }
+                      });
+                      return false;
+                  })
+    </script>
+{% endblock %}

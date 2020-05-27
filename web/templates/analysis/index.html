@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}前途分析{% endblock %}
+{% block content %}
+    <div class="row">
+        <div id="anaQuizz" class="col-md-4 btn" style="text-align: left">
+            <div class="thumbnail">
+                <img src="../../static/img/quizzme.jpg" alt="">
+                <div class="caption">
+                    <h3>先做一个小测试</h3>
+                </div>
+            </div>
+        </div>
+        <div id="anaSkill" class="col-md-4 btn" style="text-align: left">
+            <div class="thumbnail">
+                <img src="../../static/img/skill2.jpg" alt="">
+                <div class="caption">
+                    <h3>技能连连看</h3>
+                </div>
+            </div>
+        </div>
+        <div id="anaResult" class="col-md-4 btn" style="text-align: left">
+            <div class="thumbnail">
+                <img src="../../static/img/analysis2.jpg" alt="">
+                <div class="caption">
+                    <h3>我们得到的结果</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    $('#anaQuizz').click(function () {
+        alert('功能暂未开发，请联系管理员');
+       //window.location.href = '/ana/quizz{% if request.session.uid %}?uid={{ request.session.uid|safe }}{% else %}{% endif %}';
+    });
+    $('#anaSkill').click(function () {
+        alert('功能暂未开发，请联系管理员');
+    });
+    $('#anaResult').click(function () {
+        alert('功能暂未开放，请联系管理员');
+    })
+    </script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}注册成功{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row" style="height:800px">
+            <div class="span4">
+                <div class="alert alert-success"><b style="font-size: 15px">恭喜您注册成功</b>，还差一步验证您的邮箱 <b style="color: red">{{ email }}</b> 就成功了！点击
+                    <span class="btn btn-info" id="sendMail">发送邮件</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- loading -->
+    <div class="modal fade" id="sendMailLoading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h1>正在发送邮件中...</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    $('#sendMail').click(function () {
+        $('#sendMailLoading').modal('show');
+        $.ajax({
+           url: '/api/sendmail',
+           type: 'get',
+           data: {
+               'email': '{{ email|safe }}',
+               'sign': '{{ sign|safe }}'
+           },
+           dataType: 'json',
+           success: function (res) {
+               if(res.status === 200) {
+                   $('#sendMailLoading').modal('hide');
+                   alert('发送成功，快去登录邮箱激活账户吧');
+               }
+               else if(res.status === 300005) {
+                   $('#sendMailLoading').modal('hide');
+                   alert('您已经发送过邮件，请稍等再试');
+               }
+               else if(res.status === 300006) {
+                   $('#sendMailLoading').modal('hide');
+                   alert('验证邮件发送失败!');
+               }
+           }
+       })
+    });
+    </script>
+{% endblock %}

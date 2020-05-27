@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}排行榜{% endblock %}
+{% block content %}
+
+<div class="main-content container">
+        <div class="position toInWhere">
+            <b>当前位置：</b><span>
+                <a onclick="canNav(2,0);">比赛结果</a>
+            </span>&nbsp;&gt;&nbsp;<span>排行榜</span>
+        </div>
+        <div class="inner-content">
+            <div class="xxdj-report border zycs_text" style="min-height: 1000px;">
+                <div class="course-report">
+                    <h1 style="background: url(../static/images/course-h1.jpg) no-repeat center top;">排行榜</h1>
+                        <div class="col-md-9">
+                             <div class="course-report">
+                                    <table style="margin-top: 15px;" class="table table-hover">
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>昵称</th>
+                                        <th>得分</th>
+                                        <th>用时</th>
+                                    </tr>
+                                    {% for r in rank %}
+                                    <tr>
+                                        <td>{% if r.rank %}<b style="color:red">{{ r.rank }}</b>{% else %}暂无{% endif %}</td>
+                                        <td>{% if r.nickname %}{{ r.nickname }}{% else %}暂无{% endif %}</td>
+                                        <td>{% if r.score %}{{ r.score }}{% else %}0{% endif %}</td>
+                                        <td>{% if r.time %}{{ r.time }}{% else %}暂无{% endif %}s</td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-3" style="margin-top: 20px;padding-left: 20px;">
+                            <div class="panel panel-success">
+                                <div class="panel-heading panel-danger" style="text-align:center">历史最佳排名</div>
+                                <div class="panel-body" id="myRank">
+                                    <div id="myResult">
+
+                                    </div>
+                                    <div style="padding: 10px 0">
+                                     <a class="btn btn-info" href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">回首页</a>
+                                     <a class="btn btn-info" href="/bs{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}&kind_id={{ kind_info.kind_id }}" style="margin-left: 20px;">去答题</a>
+                                    </div>
+                                </div>
+                                <div class="panel-footer panel-success"></div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/myrank',
+                data: {
+                    uid: '{{ request.session.uid|safe }}',
+                    kind_id: '{{ kind_info.kind_id|safe }}'
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (res) {
+                    if(res.status === 200) {
+                        var rank  = res.data.rank;
+                        var timer = res.data.time / 1000 ;
+                        if (rank){
+                            var myResult = '<label><h4><b>我的排名:</b>&nbsp;&nbsp; 第<span class="rank" style="color:red">'+ rank + '</span>名</h4></label>'
+                                            + '<label><h4><b>我的用时:</b>&nbsp;&nbsp; <span class="timer" style="color:red">' + timer + '</span>秒</h4></label>'
+                        }else {
+                            var myResult = '<label><h4>您还没有参加比赛哦！<label><h4>'
+                        }
+                        $('#myResult').html(myResult)
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

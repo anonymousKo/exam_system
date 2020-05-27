@@ -1,0 +1,460 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>{% block title %}{% endblock %}</title>
+      <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+      <script src="{% static 'js/jquery.min.js' %}"></script>
+      <!--bootstrap核心js-->
+      <script src="{% static 'js/bootstrap.min.js' %}"></script>
+      <style>
+        .cate {
+            padding-bottom: 20px;
+        }
+        .modal-dialog {
+            padding-top : 200px;
+        }
+    </style>
+  </head>
+  <body>
+  <div class="main-container">
+    <div class="top-container" >
+        <div class="newIndex-header container" style="background-image: url('/static/images/logo.png');">
+        <!--nav_menu-->
+
+        <ul id="nav_menu" class="nav_menu clearfix">
+            <li class="nLi no">
+                <h3>
+                    <a  href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">首页</a>
+                </h3>
+            </li>
+            <li class="nLi">
+                <h3>
+                    <a  href="/bs/set{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">快速出题</a>
+                </h3>
+            </li>
+            <li class="nLi">
+                <h3>
+                    <a  href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">成为机构</a>
+                </h3>
+            </li>
+            <li class="nLi login" >
+                <h3 style="min-width: 100px;">
+                    <a href="javascript:void(0);">
+                        {% if request.session.uid %}{{ request.session.username }}{% else %}登 录{% endif %}
+                    </a>
+                </h3>
+                <ul class="sub" style="overflow: hidden; display: none;">
+                  {% if request.session.uid %}
+                      <li><a href="/logout">注销</a></li>
+                      <li id="resetPassword"><a href="#">修改密码</a></li>
+                  {% else %}
+                      <li><a id="signInNormal" href="#">密码登录</a></li>
+                  {% endif %}
+                </ul>
+            </li>
+        </ul>
+        <!--end nav_menu -->
+        </div>
+    </div>
+  <div class="modal" id="signInModalNormal" tabindex="-1" role="dialog" aria-labelledby="signInModalNormalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="signInModalNormalLabel">登录</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+            <div class="form-group">
+                <label for="signInId" >邮箱</label>
+                <input type="text" class="form-control" id="signInId" placeholder="hugo.zhang@example.com">
+            </div>
+            <div class="form-group">
+                <label for="signInPassword" >密码</label>
+                <input type="password" class="form-control" id="signInPassword" placeholder="#p@ssw0d123">
+            </div>
+            <div class="form-group">
+                <label for="signInVcode" >验证码</label>
+                <input type="text" class="form-control" id="signInVcode" placeholder="">
+                <img id="signInVcodeImg" src="" style="height: 50px;width: 150px;" />
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <a href="#" id="resetPassword" style="margin-right: 10px;" >忘记密码？</a>
+          <a href="#" id="signUp" style="margin-right: 30px;" >注册</a>
+          <button type="button" class="btn btn-primary" id="signInPost">登录</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="signUpModalLabel">注册</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+            <div class="form-group">
+                <label for="signUpId" >邮箱</label>
+                <input type="text" class="form-control" id="signUpId" placeholder="hugo.zhang@example.com">
+            </div>
+            <div class="form-group">
+                <label for="signUpPassword" >密码</label>
+                <input type="password" class="form-control" id="signUpPassword" placeholder="#p@ssw0d123">
+            </div>
+            <div class="form-group">
+                <label for="signUpPasswordAgain" >确认密码</label>
+                <input type="password" class="form-control" id="signUpPasswordAgain" placeholder="#p@ssw0d123">
+            </div>
+            <div class="form-group">
+                <label for="signUpVcode" >验证码</label>
+                <input type="text" class="form-control" id="signUpVcode" placeholder="">
+                <img id="signUpVcodeImg" src="" style="height: 50px;width: 150px;" />
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <a href="#" id="signIn" style="margin-right: 30px;" >已有账户，去登录</a>
+          <button type="button" class="btn btn-primary" id="signUpPost">注册</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="resetPasswordLabel">重置密码</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+            <div class="form-group">
+                <label for="resetId" >邮箱</label>
+                <input type="text" class="form-control" id="resetId" placeholder="hugo.zhang@example.com">
+            </div>
+            <div class="form-group">
+                <label for="resetNewPassword" >新密码</label>
+                <input type="password" class="form-control" id="resetNewPassword" placeholder="p@ssw0rd123">
+            </div>
+            <div class="form-group">
+                <label for="resetNewPasswordAgain">再次输入密码</label>
+                <input type="password" class="form-control" id="resetNewPasswordAgain" placeholder="p@ssw0rd123">
+            </div>
+            <div class="form-group">
+                <p style="color: red">邮件发送后，请在三十分钟之内登录邮箱确认!</p>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="resetPost">发送邮件</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- loading -->
+    <div class="modal fade" id="resetPasswordLoading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h1>正在发送邮件中...</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block content %} {% endblock %}
+    <div class="footer">
+    <div class="footer-nav">
+        <a href="/index">首页</a>|
+      
+    </div>
+    
+    </div>
+  </div>
+  </div>
+  <script type="text/javascript">
+    $(function(){
+        $(".login").mouseover(function(){
+                $(".sub").show();
+            }).mouseout(function(){
+                $(".sub").hide();
+            })
+        })
+</script>
+    <script>
+      $.ajaxSetup({
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+      });
+      var loginSign;
+      {% if not has_login %}
+          // 点击登录
+          $('#signInNormal').click(function () {
+              refreshVcode('signin');
+              $('#signInModalNormal').modal('show');
+              $('#signInVcodeImg').click(function () {
+                  refreshVcode('signin');
+              });
+              $('#signInPost').click(function () {
+                  var email = $('#signInId').val();
+                  var password = $('#signInPassword').val();
+                  var vcode = $('#signInVcode').val();
+                  if(!checkEmail(email)){
+                      $('#signInId').val('');
+                      $('#signInId').attr('placeholder', '邮件格式错误');
+                      $('#signInId').css('border', '1px solid red');
+                      return false;
+                  }else{
+                      $('#signInId').css('border', '1px solid #C1FFC1');
+                  }
+                  if(!password){
+                      $('#signInPassword').attr('placeholder', '请填写密码');
+                      $('#signInPassword').css('border', '1px solid red');
+                  }else{
+                      $('#signInPassword').css('border', '1px solid #C1FFC1');
+                  }
+                  $.ajax({
+                  url: '/api/login_normal',
+                  data: {
+                      'email': email,
+                      'password': password,
+                      'sign': loginSign,
+                      'vcode': vcode
+                  },
+                  type: 'post',
+                  dataType: 'json',
+                  success: function(res){
+                      if (res.status === 200){
+                          $('#signInModalNormal').modal('hide');
+                          window.location.href = '/index';
+                      }
+                      else if(res.status === 300001) {
+                          alert('用户名错误');
+                      }
+                      else if(res.status === 300002) {
+                          alert('密码错误');
+                      }
+                      else if(res.status === 300003) {
+                          alert('验证码错误');
+                      }
+                      else {
+                          alert('登录错误');
+                      }
+                  }
+              })
+              });
+              $('#signUp').click(function () {
+                  refreshVcode('signup');
+                  $('#signInModalNormal').modal('hide');
+                  $('#signUpModal').modal('show');
+                  $('#signInVcodeImg').click(function () {
+                      refreshVcode('signup');
+                  });
+              });
+              $('#signIn').click(function () {
+                  refreshVcode('signin');
+                  $('#signUpModal').modal('hide');
+                  $('#signInModalNormal').modal('show');
+                  $('#signInVcodeImg').click(function () {
+                      refreshVcode('signup');
+                  });
+              });
+              $('#signUpPost').click(function () {
+                  var email = $('#signUpId').val();
+                  var password = $('#signUpPassword').val();
+                  var passwordAgain = $('#signUpPasswordAgain').val();
+                  var vcode = $('#signUpVcode').val();
+                  if(!checkEmail(email)) {
+                      $('#signUpId').val('');
+                      $('#signUpId').attr('placeholder', '邮箱格式错误');
+                      $('#signUpId').css('border', '1px solid red');
+                      return false;
+                  }else{
+                      $('#signUpId').css('border', '1px solid #C1FFC1');
+                  }
+                  if(!(password === passwordAgain)) {
+                      $('#signUpPasswordAgain').val('');
+                      $('#signUpPasswordAgain').attr('placeholder', '两次密码输入不一致');
+                      $('#signUpPassword').css('border', '1px solid red');
+                      $('#signUpPasswordAgain').css('border', '1px solid red');
+                      return false;
+                  }else{
+                      $('#signUpPassword').css('border', '1px solid #C1FFC1');
+                      $('#signUpPasswordAgain').css('border', '1px solid #C1FFC1');
+                  }
+                  $.ajax({
+                      url: '/api/signup',
+                      type: 'post',
+                      data: {
+                          'email': email,
+                          'password': password,
+                          'password_again': passwordAgain,
+                          'sign': loginSign,
+                          'vcode': vcode
+                      },
+                      dataType: 'json',
+                      success: function (res) {
+                          if(res.status === 200) {
+                              sign = res.data.sign;
+                              email = res.data.email;
+                              window.location.href = '/auth/signup_redirect?email=' + email + '&sign=' + sign;
+                          }
+                          else if(res.status === 300002) {
+                              alert('两次输入密码不一致');
+                          }
+                          else if(res.status === 300003) {
+                              alert('验证码错误');
+                          }
+                          else if(res.status === 300004) {
+                              alert('用户名已存在');
+                          }
+                      }
+                  })
+              });
+              $('#resetPassword').click(function () {
+                  resetPassword();
+              })
+          });
+      {% else %}
+          var userId = {% if request.session.uid %}'{{ request.session.username|safe }}'{% else %}"登录"{% endif %}
+          $('#signInButton').html(userId);
+          strHTML = "<li><a href=\"/logout\">注销</a></li><li id=\"resetPassword\"><a href=\"#\">修改密码</a></li>";
+          $('#signInDropdownMenu').html(strHTML);
+      {% endif %}
+
+      $('#resetPassword').click(function () {
+          resetPassword()
+      });
+
+      $('#searchCom').click(function () {
+          window.location.href = '/bs/search?uid={% if request.session.uid %}{{ request.session.uid.uid }}{% endif %}&keyword=' + $('#searchKeyWord').val();
+          return false;
+      });
+
+      var refreshVcode = function (label) {
+          $.ajax({
+              url: '/api/login_vcode',
+              data: {},
+              dataType: 'json',
+              type: 'get',
+              success: function (res) {
+                  if (res.status === 200) {
+                      loginSign = res.data.sign;
+                      if(label === 'signin') {
+                          $('#signInVcodeImg').attr('src', "data:image/png;base64," + res.data.vcode);
+                      }
+                      if(label === 'signup') {
+                          $('#signUpVcodeImg').attr('src', "data:image/png;base64," + res.data.vcode);
+                      }
+                  }
+              }
+          });
+      }
+  </script>
+  <script>
+      function getCookie(c_name)
+      {
+          if (document.cookie.length>0)
+          {
+              c_start=document.cookie.indexOf(c_name + "=");
+              if (c_start!==-1)
+              {
+                  c_start=c_start + c_name.length+1;
+                  c_end=document.cookie.indexOf(";",c_start);
+                  if (c_end===-1) c_end=document.cookie.length;
+                  return unescape(document.cookie.substring(c_start,c_end))
+              }
+          }
+          return ""
+      }
+
+      function setCookie(c_name,value,expiredays)
+      {
+          var exdate=new Date();
+          exdate.setDate(exdate.getDate()+expiredays);
+          document.cookie=c_name+ "=" +escape(value)+
+              ((expiredays==null) ? "" : "; expires="+exdate.toGMTString())
+      }
+
+      function checkEmail(email) {
+          return email.match('^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$')
+      }
+
+      function checkPassword(password) {
+          return password.match('^\\w{6,18}$');
+      }
+
+      function  resetPassword() {
+          $('#signInModalNormal').modal('hide');
+                  $('#resetPasswordModal').modal('show');
+                  $('#resetPost').click(function () {
+                      var email = $('#resetId').val();
+                      var newPassword = $('#resetNewPassword').val();
+                      var newPasswordAgain = $('#resetNewPasswordAgain').val();
+                      if(!checkEmail(email)) {
+                          $('#resetId').val('');
+                          $('#resetId').attr('placeholder', '邮件格式错误');
+                          $('#resetId').css('border', '1px solid red');
+                          return false;
+                      }else{
+                          $('#resetId').css('border', '1px solid #C1FFC1');
+                      }
+                      if(!(newPassword === newPasswordAgain)){
+                          $('#resetNewPasswordAgain').val('');
+                          $('#resetNewPasswordAgain').attr('placeholder', '两次输入密码不一致');
+                          $('#resetNewPassword').css('border', '1px solid red');
+                          $('#resetNewPasswordAgain').css('border', '1px solid red');
+                          return false;
+                      }else{
+                          $('#resetNewPassword').css('border', '1px solid #C1FFC1');
+                          $('#resetNewPasswordAgain').css('border', '1px solid #C1FFC1');
+                      }
+                      $('#resetPasswordLoading').modal('show');
+                      $.ajax({
+                          url: '/api/resetpasswd',
+                          type: 'post',
+                          data: {
+                              'email': email,
+                              'new_password': newPassword,
+                              'new_password_again': newPasswordAgain
+                          },
+                          dataType: 'json',
+                          success: function (res) {
+                              if(res.status === 200) {
+                                  alert('发送成功!');
+                                  window.location.href = '/index' + {% if request.session.uid %} '?uid={{ request.session.uid|safe }}'{% else %} '' {% endif %}
+                              }
+                              else if(res.status === 300005) {
+                                  $('#sendMailLoading').modal('hide');
+                                  alert('您已发送过邮件，请稍后再试');
+                                  window.location.href = '/index' + {% if request.session.uid %} '?uid={{ request.session.uid|safe }}'{% else %} '' {% endif %}
+                              }
+                              else if(res.status === 300006) {
+                                  alert('邮件发送失败');
+                                  window.location.href = '/index' + {% if request.session.uid %} '?uid={{ request.session.uid|safe }}'{% else %} '' {% endif %}
+                              }
+                          }
+                      });
+                      return false;
+                  })
+      };
+      $('#home').click(function () {
+          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
+      })
+  </script>
+  </body>
+</html>
+
+

@@ -1,0 +1,65 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title %}答题结果{% endblock %}
+{% block content %}
+    <div class="main-content container">
+        <div class="position toInWhere">
+            <b>当前位置：</b><span>
+                <a onclick="canNav(2,0);">比赛结果</a>
+            </span>&nbsp;&gt;&nbsp;<span>成绩单</span>
+        </div>
+        <div class="inner-content">
+            <div class="xxdj-report border zycs_text">
+                <div class="course-report">
+                    <h1>{{kind_info.kind_name}}</h1>
+                    <div class="wid775 div-course">
+                        <h2 class="test-mb40">
+                            <span id="username">{{ request.session.username }}</span>
+                            同学的成绩单
+                        </h2>
+                        <ul class="list-group">
+                            {% if rank <= 3 %}
+                                <li class="list-group-item list-group-item-success">得分: <b>{{ qa_info.score }}</b> 分</li>
+                                <li class="list-group-item list-group-item-success">耗时: <b>{{ qa_info.time }}</b> s</li>
+                                <li class="list-group-item list-group-item-success">答对题数: <b>{{ qa_info.correct_num }}</b></li>
+                                <li class="list-group-item list-group-item-success">答错题数: <b>{{ qa_info.incorrect_num }}</b></li>
+                                <li class="list-group-item list-group-item-success">
+                                    当前排名: 第 <b style="color: red;font-size: 20px;">{{ rank }}</b> 名
+                                    <h4 style="color:gray;font-size: 20px;text-align: center;">成绩不错，继续努力哦~</h4>
+                                </li>
+                            {% else %}
+                                <li class="list-group-item list-group-item-danger">得分: <b>{{ qa_info.score }}</b> 分</li>
+                                <li class="list-group-item list-group-item-danger">耗时: <b>{{ qa_info.time }}</b> s</li>
+                                <li class="list-group-item list-group-item-danger">答对题数: <b>{{ qa_info.correct_num }}</b></li>
+                                <li class="list-group-item list-group-item-danger">答错题数: <b>{{ qa_info.incorrect_num }}</b></li>
+                                <li id="currentRank" class="list-group-item list-group-item-danger">
+                                    当前排名: 第 <b style="color: red;font-size: 20px;">{{ rank }}</b> 名
+                                    <h4 style="color:gray;font-size: 20px;text-align: center;">成绩不理想，再试试吧~</h4>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="center-p">
+                         <li id="goBack" class="btn btn-primary" style="margin-top: 36px;">回首页</li>
+                         <li id="tryAgain" class="btn btn-primary" style="margin: 36px 30px 0 30px">再试试</li>
+                         <li id="goRank" class="btn btn-success" style="margin-top: 36px; ">查看排行榜</li>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript">
+      $('#goRank').click(function () {
+          window.location.href = '/bs/rank?uid={{ request.session.uid }}&kind_id={{ kind_info.kind_id }}';
+      });
+      $('#tryAgain').click(function () {
+          window.location.href = '/bs?uid={{ request.session.uid }}&kind_id={{ kind_info.kind_id }}';
+      });
+      $('#goHome').click(function () {
+          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
+      });
+      $('#goBack').click(function () {
+          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
+      })
+    </script>
+{% endblock %}

@@ -1,0 +1,197 @@
+Metadata-Version: 2.0
+Name: TimeConvert
+Version: 1.4.3
+Summary: Time Convert for Humans™
+Home-page: https://github.com/xxx-convert/TimeConvert
+Author: Hackathon
+Author-email: kimi.huang@brightcells.com
+License: UNKNOWN
+Description-Content-Type: UNKNOWN
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.5
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: python-dateutil
+Requires-Dist: pytz
+Requires-Dist: tzlocal
+
+===========
+TimeConvert
+===========
+
+TimeConvert is a simple time convert script(library) for Python, built for human beings.
+
+Installation
+============
+
+::
+
+    pip install TimeConvert
+
+
+Usage
+=====
+
+::
+
+    from TimeConvert import TimeConvert as tc
+
+    tc.utc_timestamp()
+
+
+Variable
+========
+
+::
+
+    # Default Asia/Shanghai & %Y-%m-%d %H:%M:%S
+    from TimeConvert import TIME_ZONE, TIME_FORMAT
+
+    # Deassign TIME_ZONE & TIME_FORMAT
+    tc.__init__(timezone='Asia/Shanghai', format='%Y-%m-%d %H:%M:%S')
+
+
+Method
+======
+
+::
+
+    # VALIDATE
+
+    def validate_string(self, string, format=None):
+
+    # REPLACE
+
+    def remove_microsecond(self, self, dt):
+
+    # DATETIME
+
+    def utc_datetime(self, ms=True):
+
+    def local_datetime(self, ms=True, timezone=None):
+
+    def is_utc_datetime(self, dt):
+
+    def is_local_datetime(self, dt, local_tz=None):
+
+    def to_utc_datetime(self, dt, timezone=None):
+
+    def to_local_datetime(self, dt, timezone=None):
+
+    def yesterday_utc_datetime(self, ms=True):
+
+    def tomorrow_utc_datetime(self, ms=True):
+
+    def yesterday_local_datetime(self, ms=True, timezone=None):
+
+    def tomorrow_local_datetime(self, ms=True, timezone=None):
+
+    def several_days_ago(self, dt=None, utc=True, timezone=None, days=0):
+
+    def several_days_coming(self, dt=None, utc=True, timezone=None, days=0):
+
+    def several_time_ago(self, dt=None, utc=True, timezone=None, years=0, months=0, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
+
+    def several_time_coming(self, dt=None, utc=True, timezone=None, years=0, months=0, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
+
+    # STRING
+
+    def utc_string(self, utc_dt=None, format=None, timezone=None, years=0, months=0, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
+
+    def local_string(self, local_dt=None, format=None, timezone=None, years=0, months=0, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
+
+    def datetime_to_string(self, dt, format=None):
+
+    # TIMESTAMP
+
+    def utc_timestamp(self, utc_dt=None, ms=False, micro=False, milli=False):
+
+    def local_timestamp(self, local_dt=None, ms=False, micro=False, milli=False):
+
+    def datetime_to_timestamp(self, dt, ms=False):
+
+    def seconds_to_microseconds(self, s):
+
+    def seconds_to_milliseconds(self, s):
+
+    # STRING ==> DATETIME
+
+    def string_to_datetime(self, string, format=None):
+
+    def string_to_utc_datetime(self, string, format=None):
+
+    def string_to_local_datetime(self, string, format=None):
+
+    def utc_string_to_utc_datetime(self, utc_string, format=None):
+
+    def utc_string_to_local_datetime(self, utc_string, format=None):
+
+    # STRING ==> TIMESTAMP
+
+    def string_to_timestamp(self, string, format=None, ms=False):
+
+    def string_to_utc_timestamp(self, string, format=None, ms=False):
+
+    def string_to_local_timestamp(self, string, format=None, ms=False):
+
+    # TIME_DELTA
+
+    def timestamp_delta(self, stamp1, stamp2, interval=None):
+
+    def datetime_delta(self, dt1, dt2, interval=None):
+
+    def string_delta(self, string1, string2, interval=None, format=None, format1=None, format2=None):
+
+    PS: interval(seconds) —— Time1 - Time2 >= interval ?
+
+    # TIME_COUNT_DOWN
+
+    def timestamp_countdown(self, stamp):
+
+    def datetime_countdown(self, dt):
+
+    def string_countdown(self, string, format=None):
+
+    # MIDNIGHT
+
+    def utc_datetime_midnight(self, utc_dt=None):
+
+    def utc_seconds_since_midnight(self, utc_dt=None):
+
+    def local_datetime_midnight(self, local_dt=None):
+
+    def local_seconds_since_midnight(self, local_dt=None):
+
+    def datetime_midnight(self, dt=None, utc=False):
+
+    def seconds_since_midnight(self, dt=None, utc=False):
+
+    # AWARE vs. NAIVE
+
+    def is_aware(self, value):
+
+    def is_naive(self, value):
+
+    def make_aware(self, value, timezone=None):
+
+    def make_naive(self, value, timezone=None):
+
+    # PAST vs. FUTURE
+
+    def is_past_time(self, value, base_dt=None, format=None, utc=True):
+
+    def is_future_time(self, value, base_dt=None, format=None, utc=True):
+
+    # OTHER
+
+    def total_seconds(self, td):  # timedelta
+
+

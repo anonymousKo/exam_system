@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}查询结果{% endblock %}
+{% block content %}
+    <div class="list-group ">
+      <h2 class="text-center">查询结果</h2><br />
+      {% for r in result %}
+          <a href="{% url 'bs:index' %}?uid={{ request.session.uid }}&kind_id={{ r.kind_id }}" class="list-group-item">{{ r.kind_name }}<p style="float: right">举办机构: {% if r.sponsor_name == None %} 无 {% else %} {{ r.sponsor_name }} {% endif %}</p></a>
+      {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ errtitle }}{% endblock %}\
+{% block content %}
+<div class="container">
+    <div class="row" style="min-height: 800px;">
+        <div class="span4" style="text-align: center;">
+            <div class="alert alert-danger">
+                <strong>出错了/(ㄒoㄒ)/~~</strong>&nbsp;&nbsp; {{ errmsg }}
+                <a href="#" onclick="history.back(-1);" style="float:right">
+                    <span class="glyphicon glyphicon-menu-left"></span>
+                    <strong>返回上一页</strong>
+                </a>
+            </div>
+            <img src="{% static 'img/404.png' %}">
+        </div>
+    </div>
+</div>
+{% endblock %}
