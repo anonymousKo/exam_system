@@ -17,7 +17,7 @@ REDIS = {
         'db': 0,
     }
 }
-BANK_REPO = ' F:/PythonProject/exam/backup '  # 修改为存放excel题库的位置，用来保留题库
+BANK_REPO = 'C:\\Users\\KSX\\Desktop\\Code\\20\\Exam\\backup'  # 修改为存放excel题库的位置，用来保留题库
 BASE_NUM_ID = 100000
 INIT_PASSWORD = 'p@ssw0rd'
 DOMAIN = "http://xxx.xx.xx.xxx"  #### 需要修改此处域名
