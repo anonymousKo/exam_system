@@ -1,6 +1,6 @@
 certifi==2018.11.29
 chardet==3.0.4
-Django==2.1
+Django==2.2.13
 django-shortuuidfield==0.1.3
 furl==1.0.1
 idna==2.6
